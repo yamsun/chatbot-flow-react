@@ -188,7 +188,6 @@
 
 .settings-panel {
   padding: 20px;
-  width: 200px;
   background: #f4f4f4;
   border-left: 1px solid #ddd;
 }
@@ -253,6 +252,11 @@
   }
 
   .dndflow aside {
+    width: 20%;
+    max-width: 250px;
+  }
+
+  .dndflow aside .settings-panel{
     width: 20%;
     max-width: 250px;
   }

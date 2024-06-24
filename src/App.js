@@ -19,7 +19,7 @@ const initialNodes = [
   {
     id: '1',
     type: 'message', // Specify the custom node type
-    data: { label: 'Custom Node' },
+    data: { label: 'Sample message' },
     position: { x: 250, y: 20 },
     sourcePosition: 'right',
     targetPosition: 'left',
@@ -27,7 +27,7 @@ const initialNodes = [
   {
     id: '2',
     type: 'message', // Specify the custom node type
-    data: { label: 'Custom Node' },
+    data: { label: 'Click to edit' },
     position: { x: 550, y: 120 },
     sourcePosition: 'right',
     targetPosition: 'left',
@@ -35,27 +35,37 @@ const initialNodes = [
 ];
 
 const initialEdges = [
-  { id: 'e1-2', source: '1', target: '2' },
+  { id: 'e1-2', source: '1', target: '2',  markerEnd: { type: 'arrowclosed', color:"#666" } },
 ];
 const nodeTypes = { 'message': CustomNode };
 
 
 const DnDFlow = () => {
   const reactFlowWrapper = useRef(null);
-  const [nodes, setNodes, onNodesChange] = useNodesState(initialNodes);
-  const [edges, setEdges, onEdgesChange] = useEdgesState(initialEdges);
+  const [nodes, setNodes, onNodesChange] = useNodesState([]);
+  const [edges, setEdges, onEdgesChange] = useEdgesState([]);
   const [reactFlowInstance, setReactFlowInstance] = useState(null);
   const [selectedNode, setSelectedNode] = useState(null);
   const [isSettingsPanelOpen, setIsSettingsPanelOpen] = useState(false);
 
-   // Load from localStorage on component mount
-   useEffect(() => {
-    const savedNodes = JSON.parse(localStorage.getItem('reactFlowNodes')) || [];
-    const savedEdges = JSON.parse(localStorage.getItem('reactFlowEdges')) || [];
+  // Load from localStorage on component mount, but only if not already set
+useEffect(() => {
+  const savedNodes = JSON.parse(localStorage.getItem('reactFlowNodes'));
+  const savedEdges = JSON.parse(localStorage.getItem('reactFlowEdges'));
 
+  if (savedNodes && savedNodes.length > 0) {
     setNodes(savedNodes);
+  } else {
+    setNodes(initialNodes);
+  }
+
+  if (savedEdges && savedEdges.length > 0) {
     setEdges(savedEdges);
-  }, []);
+  } else {
+    setEdges(initialEdges);
+  }
+}, [initialNodes, initialEdges]); // Add initialNodes and initialEdges to dependencies if they can change
+
 
    // Function to generate random ID
    const generateRandomId = () => `node_${Math.random().toString(36).substr(2, 9)}`;
@@ -77,7 +87,10 @@ const DnDFlow = () => {
       }
 
       // Allow the connection if there's no existing edge
-      setEdges((prevEdges) => addEdge(params, prevEdges));
+      // setEdges((prevEdges) => addEdge(...params, prevEdges));
+      setEdges((prevEdges) =>
+        addEdge({ ...params, markerEnd: { type: 'arrowclosed', color: '#666' }, }, prevEdges)
+      );
     },
     [edges, setEdges]
   );
@@ -162,7 +175,6 @@ const DnDFlow = () => {
 
     }
   }, [nodes, edges]);
-
 
   return (
     <div className='screen'>
